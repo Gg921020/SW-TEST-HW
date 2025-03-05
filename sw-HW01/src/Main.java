@@ -1,13 +1,15 @@
 import java.util.*;
 
+
 class Team implements Comparable<Team> {
     String name;
-    String league; // AL or NL
-    String division; // East, Central, West
+    String league; // 聯盟: AL 或 NL
+    String division; // 分區: East, Central, West
     int wins;
     int losses;
     int seed;
 
+    //初始化球隊資訊，包含防錯機制
     public Team(String name, String league, String division, int wins, int losses) {
         if (name == null || league == null || division == null || wins < 0 || losses < 0) {
             throw new IllegalArgumentException("Invalid team data");
@@ -19,19 +21,18 @@ class Team implements Comparable<Team> {
         this.losses = losses;
     }
 
+    // 計算勝率
     public double getWinRate() {
         return (double) wins / (wins + losses);
     }
 
+    // 比較方法，用於排序球隊，勝率高者排前面
     @Override
     public int compareTo(Team other) {
         return Double.compare(other.getWinRate(), this.getWinRate());
     }
 
-    @Override
-    public String toString() {
-        return name + " (" + league + " - " + division + ") " + wins + "W-" + losses + "L";
-    }
+
 }
 
 public class Main {
@@ -39,6 +40,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         List<Team> alTeams = new ArrayList<>();
         List<Team> nlTeams = new ArrayList<>();
+
+        int totalGames = 0;
 
         for (int i = 0; i < 30; i++) {
             try {
@@ -48,10 +51,13 @@ public class Main {
                 }
 
                 String teamName = input[0];
-                String league = input[1].toUpperCase();
-                String division = input[2].toUpperCase();
+                String league = input[1];
+                String division = input[2];
                 int wins = Integer.parseInt(input[3]);
                 int losses = Integer.parseInt(input[4]);
+
+                // 檢查總場次是否一致
+                totalGames += wins + losses;
 
                 Team team = new Team(teamName, league, division, wins, losses);
 
@@ -64,20 +70,25 @@ public class Main {
                 }
             } catch (Exception e) {
                 System.out.println("Error processing input: " + e.getMessage());
-                i--; // 重試當前輸入
+                i--; // 重新輸入該隊資訊
             }
         }
 
+        // 確保總場次一致（每場比賽應該有兩支球隊參與）
+        assert totalGames % 2 == 0 : "Total games played should be even, indicating every game has a winner and a loser.";
+
         // 選出分區冠軍
-        Map<String, Team> alChampions = getDivisionChampions(alTeams);
-        Map<String, Team> nlChampions = getDivisionChampions(nlTeams);
+        Map<String, Team> alChampions = getChampions(alTeams);
+        Map<String, Team> nlChampions = getChampions(nlTeams);
 
         List<Team> alChampionTeams = new ArrayList<>(alChampions.values());
         List<Team> nlChampionTeams = new ArrayList<>(nlChampions.values());
 
+        // 依勝率排序分區冠軍
         Collections.sort(alChampionTeams);
         Collections.sort(nlChampionTeams);
 
+        // 設定種子排名
         for (int i = 0; i < alChampionTeams.size(); i++) {
             alChampionTeams.get(i).seed = i + 1;
         }
@@ -85,14 +96,13 @@ public class Main {
             nlChampionTeams.get(i).seed = i + 1;
         }
 
-        List<Team> alWildCards = getWildCardTeams(alTeams, alChampionTeams);
-        List<Team> nlWildCards = getWildCardTeams(nlTeams, nlChampionTeams);
+        // 取得外卡球隊
+        List<Team> alWildCards = getWildCard(alTeams, alChampionTeams);
+        List<Team> nlWildCards = getWildCard(nlTeams, nlChampionTeams);
 
-        if (alWildCards.size() < 3 || nlWildCards.size() < 3) {
-            System.out.println("Error: Not enough teams to fill the wildcard slots.");
-            return;
-        }
 
+
+        // 顯示美聯與國聯的季後賽對戰表
         System.out.println("(AMERICAN LEAGUE)");
         System.out.println("|WILDCARD | ALDS  | ALCS    | WORLD SERIES |");
         System.out.printf("%s 6 ---\n", alWildCards.get(2).name);
@@ -112,7 +122,8 @@ public class Main {
         System.out.println("\n(NATIONAL LEAGUE)");
     }
 
-    public static Map<String, Team> getDivisionChampions(List<Team> teams) {
+    // 取得分區冠軍
+    public static Map<String, Team> getChampions(List<Team> teams) {
         Map<String, Team> champions = new HashMap<>();
         for (Team team : teams) {
             champions.putIfAbsent(team.division, team);
@@ -123,7 +134,8 @@ public class Main {
         return champions;
     }
 
-    public static List<Team> getWildCardTeams(List<Team> teams, List<Team> champions) {
+    // 取得外卡球隊（非分區勝率前三高）
+    public static List<Team> getWildCard(List<Team> teams, List<Team> champions) {
         List<Team> wildCards = new ArrayList<>();
         for (Team team : teams) {
             if (!champions.contains(team)) {
@@ -135,7 +147,7 @@ public class Main {
     }
 }
 
-/*
+/*一般測資
 BAL AL East 101 61
 BOS AL East 78 84
 NYY AL East 82 80
@@ -167,3 +179,5 @@ LAD NL West 100 62
 SD NL West 82 80
 SF NL West 79 83
 */
+
+
