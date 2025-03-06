@@ -28,8 +28,8 @@ class Team implements Comparable<Team> {
 
     // 比較方法，用於排序球隊，勝率高者排前面
     @Override
-    public int compareTo(Team other) {
-        return Double.compare(other.getWinRate(), this.getWinRate());
+    public int compareTo(Team team) {
+        return Double.compare(team.getWinRate(), this.getWinRate());
     }
 
 
