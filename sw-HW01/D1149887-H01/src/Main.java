@@ -8,31 +8,23 @@ class Team implements Comparable<Team> {
     int wins;
     int losses;
     int seed;
-
     //初始化球隊資訊，包含防錯機制
     public Team(String name, String league, String division, int wins, int losses) {
-        if (name == null || league == null || division == null || wins < 0 || losses < 0) {
-            throw new IllegalArgumentException("Invalid team data");
-        }
         this.name = name;
         this.league = league;
         this.division = division;
         this.wins = wins;
         this.losses = losses;
     }
-
     // 計算勝率
     public double getWinRate() {
         return (double) wins / (wins + losses);
     }
-
     // 比較方法，用於排序球隊，勝率高者排前面
     @Override
     public int compareTo(Team team) {
         return Double.compare(team.getWinRate(), this.getWinRate());
     }
-
-
 }
 
 public class Main {
@@ -47,26 +39,25 @@ public class Main {
             try {
                 String[] input = scanner.nextLine().split(" ");
                 if (input.length != 5) {
-                    throw new IllegalArgumentException("Invalid input format. Expected: TeamName League Division Wins Losses");
+                    throw new IllegalArgumentException("輸入異常. Expected: TeamName League Division Wins Losses");
                 }
-
                 String teamName = input[0];
                 String league = input[1];
                 String division = input[2];
                 int wins = Integer.parseInt(input[3]);
                 int losses = Integer.parseInt(input[4]);
-
                 // 檢查總場次是否一致
                 totalGames += wins + losses;
-
                 Team team = new Team(teamName, league, division, wins, losses);
-
                 if (league.equals("AL")) {
                     alTeams.add(team);
                 } else if (league.equals("NL")) {
                     nlTeams.add(team);
                 } else {
-                    throw new IllegalArgumentException("Invalid league input. Must be AL or NL.");
+                    throw new IllegalArgumentException("聯盟名稱輸入異常. 應該是 AL or NL.");
+                }
+                if(totalGames != 162){
+                    throw new IllegalArgumentException("場次輸入異常. 總場次應該是162.");
                 }
             } catch (Exception e) {
                 System.out.println("Error processing input: " + e.getMessage());
@@ -74,8 +65,8 @@ public class Main {
             }
         }
 
-        // 確保總場次一致（每場比賽應該有兩支球隊參與）
-        assert totalGames % 2 == 0 : "Total games played should be even, indicating every game has a winner and a loser.";
+
+
 
         // 選出分區冠軍
         Map<String, Team> alChampions = getChampions(alTeams);
@@ -148,36 +139,7 @@ public class Main {
 }
 
 /*一般測資
-BAL AL East 101 61
-BOS AL East 78 84
-NYY AL East 82 80
-TB AL East 99 63
-TOR AL East 89 73
-CWS AL Central 61 101
-CLE AL Central 76 86
-DET AL Central 78 84
-KC AL Central 56 106
-MIN AL Central 87 75
-HOU AL West 90 72
-LAA AL West 73 89
-OAK AL West 50 112
-SEA AL West 88 74
-TEX AL West 90 72
-ATL NL East 104 58
-MIA NL East 84 78
-NYM NL East 75 87
-PHI NL East 90 72
-WSH NL East 71 91
-CHC NL Central 83 79
-CIN NL Central 82 80
-MIL NL Central 92 70
-PIT NL Central 76 86
-STL NL Central 71 91
-ARI NL West 84 78
-COL NL West 59 103
-LAD NL West 100 62
-SD NL West 82 80
-SF NL West 79 83
+
 */
 
 
