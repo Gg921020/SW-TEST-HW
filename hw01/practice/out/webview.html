@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>LangChain Commit Message</title>
+</head>
+<body>
+    <h2>AI Commit Message 結果：</h2>
+    <pre id="result">載入中...</pre>
+
+    <script>
+        fetch('http://localhost:8080/langchain') // 指向後端 Spring Boot API
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('result').innerText = data;
+            })
+            .catch(error => {
+                document.getElementById('result').innerText = '發生錯誤：' + error;
+            });
+    </script>
+</body>
+</html>
